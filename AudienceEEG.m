@@ -21,11 +21,20 @@ ylabel('Voltage (uV)');
 legend(electrode_names);
 title('Muse raw EEG data');
 
+% eeg data is 57 seconds long!
+
+%% Fix Muse times 
+% current in packet times, need to find sampling rate and convert
 
 %% Wavelet EEG transform
 
 
 %% Load movie
+% also in data folder
+% I used quicktime to truncate the movie to the start and end of eeg
+% recording
+% The movie is also now roughly 57 seconds long
+
 
 
 %% Find movie frames of EEG start and Stop
