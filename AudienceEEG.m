@@ -7,8 +7,26 @@ clc
 addpath('functions')
 
 %% import EEG data
-rawdata = importfile_eeg101('/Users/kyle/Downloads/drive-download-20180620T215529Z-001/improbotics_closing2min_june16_2018.csv');
+
+datapath = '/Users/kyle/Downloads/drive-download-20180620T215529Z-001/';
+eegfilename = 'improbotics_closing2min_june16_2018.csv';
+videofilename = 'improbotics_closing2min_june16_2018_trimmed.mp4';
+
+
+
+rawdata = importfile_eeg101([datapath eegfilename]); %in functions
 srate = 256; 
+
+
+%% import video
+%matlab audiovideo toolbox
+% I used quicktime to truncate the movie to the start and end of eeg
+% recording
+% The movie is also now roughly 57 seconds long
+
+xyloObj = VideoReader([datapath, videofilename]);
+
+
 
 %% plot raw data
 
@@ -27,6 +45,24 @@ title('Muse raw EEG data');
 
 %% Fix Muse times 
 % current in packet times, need to find sampling rate and convert
+
+%% filtering the data (bandpass, low-pass, high-pass)
+% next we want to use an offline filter to attenuate certain ranges of
+% frequencies in the signal. There are many options for filters with different tradeoffs
+% This can be done with a butterworth filter,
+% employed by the following function. One can use this to filter low
+% frequencies (high pass), high frequencies (low pass), or to keep only a
+% band of frequencies (band pass)
+
+%here we will use a bandpass filter to filter our everything but alpha
+%oscillations. 
+
+high_pass = 6; %lower cutoff
+low_pass = 14; %upper cutoff
+order = 2; %order of polynomial used in the filter, can be increased to sharpen the dropoff of the filter
+type = 'band'; %type of filter
+[filt_data] = illini_filter(data',srate,high_pass,low_pass,order,'band'); %run the filter (which plots a graph)
+
 
 %% Wavelet EEG transform
 % Assign Frequencies of interest
@@ -68,33 +104,10 @@ subplot(3,1,2); imagesc(data.Timestamp,F,squeeze(power_wavelet(i_chan,:,:)));
 %     ylabel(c,'Log Power (dB)')
     
 
-%%
-% [B,T,P]=BOSC_tf(eegsignal,F,Fsample,wavenumber);
-%
-% This function computes a continuous wavelet (Morlet) transform on
-% a segment of EEG signal; this can be used to estimate the
-% background spectrum (BOSC_bgfit) or to apply the BOSC method to
-% detect oscillatory episodes in signal of interest (BOSC_detect).
-%
-% parameters:
-% eegsignal - a row vector containing a segment of EEG signal to be
-%             transformed
-% F - a set of frequencies to sample (Hz)
-% Fsample - sampling rate of the time-domain signal (Hz)
-% wavenumber is the size of the wavelet (typically, width=6)
-%	
-% returns:
-% B - time-frequency spectrogram: power as a function of frequency
-%     (rows) and time (columns)
-% T - vector of time values (based on sampling rate, Fsample)
-% P - estimated phase for each point in time and for each frequency - KEM 2014
 
 
 %% Load movie
 % also in data folder
-% I used quicktime to truncate the movie to the start and end of eeg
-% recording
-% The movie is also now roughly 57 seconds long
 
 
 
@@ -149,22 +162,6 @@ figure; plot(times,data);
 % modalities (heart rate and EEG), and in resampling data that has
 % irregular sampling periods
 
-%% filtering the data (bandpass, low-pass, high-pass)
-% next we want to use an offline filter to attenuate certain ranges of
-% frequencies in the signal. There are many options for filters with different tradeoffs
-% This can be done with a butterworth filter,
-% employed by the following function. One can use this to filter low
-% frequencies (high pass), high frequencies (low pass), or to keep only a
-% band of frequencies (band pass)
-
-%here we will use a bandpass filter to filter our everything but alpha
-%oscillations. 
-
-high_pass = 6; %lower cutoff
-low_pass = 14; %upper cutoff
-order = 2; %order of polynomial used in the filter, can be increased to sharpen the dropoff of the filter
-type = 'band'; %type of filter
-[filt_data] = illini_filter(data',srate,high_pass,low_pass,order,'band'); %run the filter (which plots a graph)
 
 % illini_filter.m - Created University of Illinois, based on kyle_filter by Kyle Mathewson with edits by Jamie Norton
 % [Y_filt] = illini_filter(Y,Fs,hipass,lopass,order,type)
