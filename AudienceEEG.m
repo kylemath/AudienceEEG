@@ -7,7 +7,7 @@ clc
 addpath('functions')
 
 %% import EEG data
-rawdata = importfile_eeg101('improbotics_test1/improbotics_closing2min_june16_2018.csv');
+rawdata = importfile_eeg101('/Users/kyle/Downloads/drive-download-20180620T215529Z-001/improbotics_closing2min_june16_2018.csv');
 srate = 256; 
 
 %% plot raw data
