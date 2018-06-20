@@ -5,7 +5,6 @@ close all
 clc
 
 addpath('functions')
-test=123;
 
 %% import EEG data
 rawdata = importfile_eeg101('improbotics_test1/improbotics_closing2min_june16_2018.csv');
